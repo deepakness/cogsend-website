@@ -29,9 +29,14 @@ export const LINKS = {
 	configuration: '/docs/configuration/',
 	composer: '/docs/composer/',
 	oauth: '/docs/oauth-apps/',
+	zernioDocs: '/docs/zernio/',
 	scheduling: '/docs/scheduling/',
 	api: '/docs/api/',
 	author: 'https://deepakness.com',
+	// Sponsor link. The base becomes the maintainer's affiliate URL once it
+	// exists; the UTM tags stay.
+	zernio:
+		'https://zernio.com/?utm_source=cogsend&utm_medium=sponsorship&utm_campaign=cogsend-integration&utm_content=website',
 	// Cloudflare's own free-plan numbers, linked rather than restated so this
 	// site never becomes the stale copy of a page Cloudflare maintains.
 	cfWorkersLimits: 'https://developers.cloudflare.com/workers/platform/limits/',
