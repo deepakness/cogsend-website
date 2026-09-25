@@ -1,0 +1,229 @@
+---
+import { Search } from '@lucide/astro';
+
+/**
+ * Docs search, over the Pagefind index built after `astro build`.
+ *
+ * Pagefind indexes the built HTML, so there is nothing to search in `astro dev`
+ * — the box is rendered only when the build will produce the index, which keeps
+ * a search field that silently does nothing out of the dev server. To try it
+ * locally, `npm run build` and then `npm run preview:pages`.
+ *
+ * Results are rendered as plain links under the input rather than a floating
+ * panel: the sidebar is 212px wide, and an overlay that narrow reads worse than
+ * a list that just pushes the nav down. It also means the same markup works
+ * inside the phone disclosure, where there is nowhere to float to.
+ */
+const enabled = !import.meta.env.DEV;
+---
+
+{
+	enabled && (
+		<div data-docs-search role="search" class="mb-6">
+			<label for="docs-search" class="sr-only">
+				Search the documentation
+			</label>
+			<div class="relative">
+				<Search
+					class="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-stone-500"
+					aria-hidden="true"
+				/>
+				<input
+					id="docs-search"
+					type="search"
+					placeholder="Search docs"
+					autocomplete="off"
+					spellcheck="false"
+					aria-keyshortcuts="/"
+					class="w-full rounded-xl border border-stone-200/80 bg-white py-2 pr-8 pl-9 text-[13px] font-medium text-stone-900 shadow-pill transition-colors placeholder:text-stone-500 focus:border-stone-300"
+				/>
+				<kbd
+					aria-hidden="true"
+					class="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 rounded-md border border-stone-200 px-1.5 font-mono text-[11px] leading-5 text-stone-500 lg:block"
+				>
+					/
+				</kbd>
+			</div>
+			<p data-docs-search-status class="sr-only" role="status" />
+			<p data-docs-search-empty hidden class="mt-2 px-1 text-[12.5px] font-medium text-stone-500" />
+			<ul
+				data-docs-search-results
+				hidden
+				class="mt-2 space-y-1 rounded-2xl border border-stone-200/80 bg-white p-2 shadow-card"
+			/>
+			<script is:inline>
+				// Pagefind writes its index into dist/ *after* `astro build`, so
+				// `/pagefind/pagefind.js` does not exist while Vite is bundling this
+				// page. A bundled dynamic import would be rewritten into Vite's
+				// preload helper around a path it cannot resolve, so this one import
+				// is deliberately kept out of the bundler and handed back as a
+				// function. It is called on the first keystroke, never on load.
+				window.__cogsendPagefind = () => import('/pagefind/pagefind.js');
+			</script>
+		</div>
+	)
+}
+
+<script>
+	type Result = {
+		data: () => Promise<{ url: string; excerpt: string; meta: { title?: string } }>;
+	};
+	type Pagefind = { search: (query: string) => Promise<{ results: Result[] }> };
+
+	const root = document.querySelector<HTMLElement>('[data-docs-search]');
+
+	if (root) {
+		const input = root.querySelector('input');
+		const list = root.querySelector<HTMLUListElement>('[data-docs-search-results]');
+		const status = root.querySelector<HTMLElement>('[data-docs-search-status]');
+		const empty = root.querySelector<HTMLElement>('[data-docs-search-empty]');
+
+		// Loaded on the first keystroke, never on page load: most readers never
+		// search, and the index is a download of its own. The loader itself comes
+		// from the inline script above, which is the only way to reach a file that
+		// the build step did not create yet.
+		const loader = (window as unknown as { __cogsendPagefind?: () => Promise<Pagefind> })
+			.__cogsendPagefind;
+		let loading: Promise<Pagefind> | null = null;
+		const pagefind = () => {
+			loading ??= loader ? loader() : Promise.reject(new Error('No Pagefind loader'));
+			return loading;
+		};
+
+		/**
+		 * Pagefind's excerpt is HTML with <mark> around the match. Everything is
+		 * escaped first and the marks are put back, so a result can never inject
+		 * markup into the page it is describing.
+		 */
+		const excerpt = (html: string) =>
+			html
+				.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string)
+				.replace(/&lt;mark&gt;/g, '<mark>')
+				.replace(/&lt;\/mark&gt;/g, '</mark>');
+
+		const clear = () => {
+			list?.replaceChildren();
+			if (list) list.hidden = true;
+			if (status) status.textContent = '';
+			if (empty) empty.hidden = true;
+		};
+
+		/** The result links, in order, for the arrow keys. */
+		const links = () => [...(list?.querySelectorAll<HTMLAnchorElement>('a') ?? [])];
+
+		const show = (query: string, items: { url: string; excerpt: string; meta: { title?: string } }[]) => {
+			if (!list || !status) return;
+			list.replaceChildren();
+
+			if (items.length === 0) {
+				clear();
+				status.textContent = 'No results';
+				// Written out as well as announced: an empty space under the box
+				// reads as a search that is still loading.
+				if (empty) {
+					empty.textContent = `Nothing matches “${query}”.`;
+					empty.hidden = false;
+				}
+				return;
+			}
+
+			if (empty) empty.hidden = true;
+			status.textContent = `${items.length} result${items.length === 1 ? '' : 's'}`;
+			for (const item of items) {
+				const link = document.createElement('a');
+				link.href = item.url;
+				link.className =
+					'block rounded-xl px-2.5 py-2 transition-colors hover:bg-stone-50 focus-visible:bg-stone-50';
+
+				const title = document.createElement('span');
+				title.className = 'block text-[13px] font-bold text-stone-900';
+				title.textContent = item.meta.title ?? item.url;
+
+				const body = document.createElement('span');
+				// No `block` here: line-clamp sets its own display, and a display
+				// utility alongside it wins the cascade and silently unclamps.
+				body.className =
+					'mt-0.5 line-clamp-3 text-[12px] leading-relaxed font-medium text-stone-500';
+				body.innerHTML = excerpt(item.excerpt);
+
+				link.append(title, body);
+				const entry = document.createElement('li');
+				entry.append(link);
+				list.append(entry);
+			}
+			list.hidden = false;
+		};
+
+		let timer: ReturnType<typeof setTimeout> | undefined;
+
+		input?.addEventListener('input', () => {
+			const query = input.value.trim();
+			clearTimeout(timer);
+			if (query.length < 2) {
+				clear();
+				return;
+			}
+			timer = setTimeout(async () => {
+				try {
+					const found = await (await pagefind()).search(query);
+					const items = await Promise.all(found.results.slice(0, 6).map((r) => r.data()));
+					// A slower search must not overwrite a newer one.
+					if (input.value.trim() !== query) return;
+					show(query, items);
+				} catch {
+					if (status) status.textContent = 'Search is unavailable.';
+					if (empty) {
+						empty.textContent = 'Search is unavailable right now.';
+						empty.hidden = false;
+					}
+				}
+			}, 150);
+		});
+
+		// Escape closes the results first and only then empties the box, so one
+		// press never throws away a query somebody wants to refine. Down moves
+		// into the results.
+		input?.addEventListener('keydown', (event) => {
+			if (event.key === 'ArrowDown') {
+				const first = links()[0];
+				if (first) {
+					event.preventDefault();
+					first.focus();
+				}
+				return;
+			}
+			if (event.key !== 'Escape') return;
+			if (list && !list.hidden) {
+				event.preventDefault();
+				clear();
+			}
+		});
+
+		// Up and down walk the results; up from the first goes back to the box,
+		// and Escape from anywhere in the list returns there too.
+		list?.addEventListener('keydown', (event) => {
+			const all = links();
+			const index = all.indexOf(document.activeElement as HTMLAnchorElement);
+			if (index === -1) return;
+			if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+				event.preventDefault();
+				const next = index + (event.key === 'ArrowDown' ? 1 : -1);
+				if (next < 0) input?.focus();
+				else all[Math.min(next, all.length - 1)]?.focus();
+			} else if (event.key === 'Escape') {
+				clear();
+				input?.focus();
+			}
+		});
+
+		// `/` focuses search from anywhere on a docs page, unless something that
+		// takes text already has focus.
+		document.addEventListener('keydown', (event) => {
+			if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+			const target = event.target as HTMLElement | null;
+			if (target?.closest('input, textarea, select, [contenteditable]')) return;
+			event.preventDefault();
+			input?.focus();
+		});
+	}
+</script>

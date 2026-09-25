@@ -1,0 +1,82 @@
+---
+interface Props {
+	headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+
+/** h2 and h3 only: an h4 in a sidebar is noise, and the docs use few of them. */
+const items = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+---
+
+{
+	items.length > 1 && (
+		<nav
+			data-docs-toc
+			aria-label="On this page"
+			class="hidden xl:sticky xl:top-20 xl:block xl:max-h-[calc(100dvh-7rem)] xl:self-start xl:overflow-y-auto"
+		>
+			<p class="mb-3 text-[11px] font-bold tracking-widest text-stone-500 uppercase">On this page</p>
+			<ul class="border-l border-stone-200/80">
+				{items.map((heading) => (
+					<li>
+						<a
+							href={`#${heading.slug}`}
+							data-docs-toc-link
+							class:list={[
+								'-ml-px block border-l border-transparent py-1 text-[12.5px] leading-snug font-medium text-stone-500 transition-colors hover:border-stone-300 hover:text-stone-900',
+								heading.depth === 3 ? 'pl-6' : 'pl-3'
+							]}
+						>
+							{heading.text}
+						</a>
+					</li>
+				))}
+			</ul>
+		</nav>
+	)
+}
+
+<script>
+	/**
+	 * Mark the heading you are reading. Scroll position rather than an
+	 * IntersectionObserver: with sections of very different heights, "the last
+	 * heading above the fold" is the answer a reader would give, and it does not
+	 * flicker between two entries when both are on screen.
+	 */
+	const toc = document.querySelector('[data-docs-toc]');
+
+	if (toc) {
+		const links = [...toc.querySelectorAll<HTMLAnchorElement>('[data-docs-toc-link]')];
+		const targets = links
+			.map((link) => document.getElementById(decodeURIComponent(link.hash.slice(1))))
+			.filter((target): target is HTMLElement => target !== null);
+
+		let frame = 0;
+		const mark = () => {
+			frame = 0;
+			const line = window.scrollY + 112;
+			let active = targets[0];
+			for (const target of targets) {
+				if (target.getBoundingClientRect().top + window.scrollY <= line) active = target;
+			}
+			for (const link of links) {
+				const current = active !== undefined && link.hash === `#${active.id}`;
+				link.classList.toggle('border-stone-900', current);
+				link.classList.toggle('text-stone-900', current);
+				link.classList.toggle('font-bold', current);
+				if (current) link.setAttribute('aria-current', 'location');
+				else link.removeAttribute('aria-current');
+			}
+		};
+
+		const schedule = () => {
+			if (frame) return;
+			frame = requestAnimationFrame(mark);
+		};
+
+		window.addEventListener('scroll', schedule, { passive: true });
+		window.addEventListener('resize', schedule);
+		mark();
+	}
+</script>

@@ -1,0 +1,70 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { ArrowRight, CircleAlert } from '@lucide/astro';
+import { DOCS_NAV } from '../../docs/nav.mjs';
+import { LINKS } from '../../config';
+
+/**
+ * The docs index: the same groups the sidebar shows, at a size where the
+ * one-line descriptions are worth reading. It reads `src/docs/nav.mjs` like
+ * everything else, so a page cannot be in the sidebar and missing from here.
+ */
+---
+
+<DocsLayout
+	title="Documentation"
+	description="Everything needed to run CogSend on your own Cloudflare account — the install, using the app day to day, the platforms, how publishing works, and the API."
+	prose={false}
+>
+	<!-- The cards are excluded from the search index: without this the index page
+	     matches on a run-together string of every card blurb, which reads as
+	     noise in a result. Its title and lede are still indexed. -->
+	<div data-pagefind-ignore class="mt-12 space-y-10">
+		{
+			DOCS_NAV.map((group) => (
+				<section>
+					<h2 class="text-[11px] font-bold tracking-widest text-stone-500 uppercase">{group.group}</h2>
+					<ul class="mt-4 grid gap-3 sm:grid-cols-2">
+						{group.items.map((item) => (
+							<li>
+								<a
+									href={`/docs/${item.slug}/`}
+									class="group flex h-full flex-col rounded-[1.5rem] border border-stone-200/80 bg-white p-5 shadow-card transition-all hover:border-stone-300 hover:shadow-card-lift"
+								>
+									<span class="text-[15px] font-extrabold tracking-tight text-stone-900">
+										{item.title}
+									</span>
+									<span class="mt-2 flex-1 text-[13.5px] leading-relaxed font-medium text-stone-500">
+										{item.description}
+									</span>
+									<span class="mt-4 inline-flex items-center gap-1.5 text-[12.5px] font-bold text-stone-700">
+										Read
+										<ArrowRight class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+									</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			))
+		}
+	</div>
+
+	<div
+		data-pagefind-ignore
+		class="mt-12 flex items-start gap-3 rounded-[1.5rem] border border-stone-200/80 bg-white p-5 shadow-card"
+	>
+		<CircleAlert class="mt-0.5 h-4 w-4 shrink-0 text-stone-500" aria-hidden="true" />
+		<p class="text-[13.5px] leading-relaxed font-medium text-stone-500">
+			These pages are written in the app repo, so a change to the app and a change to
+			its documentation happen in the same place. Something missing or wrong?{' '}
+			<a
+				href={LINKS.issues}
+				class="font-bold text-stone-700 underline decoration-stone-300 underline-offset-2 transition-colors hover:text-stone-900 hover:decoration-stone-500"
+			>
+				Open an issue
+			</a>
+			, and it will be fixed where it is written.
+		</p>
+	</div>
+</DocsLayout>

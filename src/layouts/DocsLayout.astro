@@ -1,0 +1,270 @@
+---
+import Layout from './Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import DocsNav from '../components/DocsNav.astro';
+import DocsSearch from '../components/DocsSearch.astro';
+import DocsToc from '../components/DocsToc.astro';
+import { ChevronDown, ArrowLeft, ArrowRight } from '@lucide/astro';
+import { LINKS, SITE } from '../config';
+import { APP_VERSION } from '../docs/meta';
+import '../styles/docs.css';
+
+interface Props {
+	title: string;
+	description: string;
+	/** The sidebar group, printed above the title as where-you-are. Left out on
+	 *  the index, which belongs to no group. */
+	group?: string;
+	/** The slug being read, for the sidebar's current item. */
+	active?: string;
+	headings?: { depth: number; slug: string; text: string }[];
+	prev?: { slug: string; title: string } | null;
+	next?: { slug: string; title: string } | null;
+	/** `docs/deploy.md` — the file this page is a copy of. */
+	source?: string;
+	/** Wrap the page body in the prose styles. Off for the index, whose content
+	 *  is cards carrying their own classes: the prose rules would put list
+	 *  markers on a grid of links. */
+	prose?: boolean;
+}
+
+const {
+	title,
+	description,
+	group,
+	active,
+	headings = [],
+	prev = null,
+	next = null,
+	source,
+	prose = true
+} = Astro.props;
+
+/**
+ * Breadcrumbs and an article, so a docs page in a result reads as
+ * `cogsend.com › Docs › Configure › Configuration` rather than as an orphan.
+ * The group has no page of its own, so it carries a name and no item.
+ */
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'TechArticle',
+			headline: title,
+			description,
+			url: canonical,
+			articleSection: group,
+			isPartOf: { '@type': 'WebSite', name: SITE.name, url: SITE.url }
+		},
+		{
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Docs', item: new URL('/docs/', SITE.url).href },
+				...(group ? [{ '@type': 'ListItem', position: 2, name: group }] : []),
+				{ '@type': 'ListItem', position: group ? 3 : 2, name: title, item: canonical }
+			]
+		}
+	]
+};
+/** The same h2/h3 filter the sidebar TOC uses, for the inline one below `xl`. */
+const tocItems = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+
+const FOOT_LINK =
+	'font-bold text-stone-600 underline decoration-stone-300 underline-offset-2 transition-colors hover:text-stone-900 hover:decoration-stone-500';
+---
+
+<Layout title={`${title} — CogSend docs`} description={description}>
+	<script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+	<Header />
+	<main id="main" class="mx-auto w-full max-w-[1180px] px-6 pt-10 pb-6">
+		<div class="lg:grid lg:grid-cols-[212px_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[212px_minmax(0,1fr)_176px]">
+			<!-- Sidebar. Sticky from `lg` up, a disclosure below it, where there is
+			     no room for both a nav and the page. -->
+			<div class="lg:sticky lg:top-20 lg:self-start">
+				<DocsSearch />
+				<details class="group lg:hidden">
+					<summary
+						class="flex cursor-pointer list-none items-center justify-between rounded-2xl border border-stone-200/80 bg-white px-4 py-3 text-[13px] font-bold text-stone-700 shadow-pill"
+					>
+						Browse the docs
+						<ChevronDown
+							class="h-4 w-4 text-stone-500 transition-transform group-open:rotate-180"
+						/>
+					</summary>
+					<DocsNav active={active} class="mt-4" />
+				</details>
+				<DocsNav active={active} class="hidden lg:block" />
+			</div>
+
+			<div class="mt-10 min-w-0 lg:mt-0">
+				<!-- `data-pagefind-body` is what gets indexed. Without it the sidebar,
+				     the header and the footer would land in every result. -->
+				<article data-pagefind-body>
+					<p class="text-[11px] font-bold tracking-widest text-stone-500 uppercase">
+						<a href="/docs/" class="transition-colors hover:text-stone-900">Docs</a>
+						{group && <span class="px-1.5 text-stone-300" aria-hidden="true">/</span>}
+						{group}
+					</p>
+					<h1
+						data-pagefind-meta="title"
+						class="mt-4 text-[2rem] leading-[1.15] font-extrabold tracking-tight text-balance text-stone-900 sm:text-[2.5rem]"
+					>
+						{title}
+					</h1>
+					<p class="mt-4 max-w-2xl text-[16px] leading-relaxed font-medium text-stone-500">
+						{description}
+					</p>
+
+					<!-- The sticky "On this page" only fits from `xl` up. Below that the
+					     long pages (deploy, configuration) still need a way in, so the
+					     same list sits here, closed until asked for. -->
+					{
+						tocItems.length > 1 && (
+							<details
+								data-pagefind-ignore
+								class="group mt-8 rounded-2xl border border-stone-200/80 bg-white shadow-pill xl:hidden"
+							>
+								<summary class="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-[13px] font-bold text-stone-700">
+									On this page
+									<ChevronDown class="h-4 w-4 text-stone-500 transition-transform group-open:rotate-180" />
+								</summary>
+								<ul class="border-t border-stone-100 px-4 py-2">
+									{tocItems.map((heading) => (
+										<li>
+											<a
+												href={`#${heading.slug}`}
+												class:list={[
+													'block py-1.5 text-[13px] leading-snug font-medium text-stone-600 transition-colors hover:text-stone-900',
+													heading.depth === 3 && 'pl-4'
+												]}
+											>
+												{heading.text}
+											</a>
+										</li>
+									))}
+								</ul>
+							</details>
+						)
+					}
+
+					<div class:list={['mt-10', prose && 'docs-prose']}>
+						<slot />
+					</div>
+				</article>
+
+				<nav aria-label="Documentation pages" class="mt-14 grid gap-3 border-t border-stone-200/80 pt-8 sm:grid-cols-2">
+					{
+						prev && (
+							<a
+								href={`/docs/${prev.slug}/`}
+								class="group flex flex-col rounded-2xl border border-stone-200/80 bg-white px-5 py-4 shadow-pill transition-all hover:border-stone-300 hover:shadow-card"
+							>
+								<span class="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-stone-500 uppercase">
+									<ArrowLeft class="h-3 w-3 transition-transform group-hover:-translate-x-0.5" />
+									Previous
+								</span>
+								<span class="mt-1.5 text-[14px] font-extrabold tracking-tight text-stone-900">
+									{prev.title}
+								</span>
+							</a>
+						)
+					}
+					{
+						next && (
+							<a
+								href={`/docs/${next.slug}/`}
+								class="group flex flex-col rounded-2xl border border-stone-200/80 bg-white px-5 py-4 text-right shadow-pill transition-all hover:border-stone-300 hover:shadow-card sm:col-start-2"
+							>
+								<span class="flex items-center justify-end gap-1.5 text-[11px] font-bold tracking-widest text-stone-500 uppercase">
+									Next
+									<ArrowRight class="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+								</span>
+								<span class="mt-1.5 text-[14px] font-extrabold tracking-tight text-stone-900">
+									{next.title}
+								</span>
+							</a>
+						)
+					}
+				</nav>
+
+				{
+					source && (
+						<p class="mt-8 text-[12.5px] leading-relaxed font-medium text-stone-500">
+							{APP_VERSION && <>Written for CogSend {APP_VERSION}. </>}
+							This page lives in the app repo, next to the code it describes. Something
+							wrong or missing?{' '}
+							<a href={`${LINKS.repo}/blob/main/${source}`} class={FOOT_LINK}>
+								Edit {source}
+							</a>{' '}
+							or{' '}
+							<a href={LINKS.issues} class={FOOT_LINK}>
+								open an issue
+							</a>
+							.
+						</p>
+					)
+				}
+			</div>
+
+			<DocsToc headings={headings} />
+		</div>
+	</main>
+	<Footer />
+</Layout>
+
+<script>
+	/**
+	 * Two additions to the rendered prose, made here because the markdown is
+	 * generated from the app repo and cannot carry them itself. Without
+	 * JavaScript the page is the same page, minus both.
+	 *
+	 * 1. A `#` link after every h2 and h3, so a section can be shared. The ids
+	 *    already exist — the app's own code links to them — this only makes them
+	 *    reachable without reading the source.
+	 * 2. A copy button on every code block. These pages are mostly commands.
+	 */
+	const prose = document.querySelector<HTMLElement>('.docs-prose');
+
+	if (prose) {
+		for (const heading of prose.querySelectorAll<HTMLHeadingElement>('h2[id], h3[id]')) {
+			const link = document.createElement('a');
+			link.href = `#${heading.id}`;
+			link.className = 'docs-anchor';
+			link.textContent = '#';
+			link.setAttribute('aria-label', `Link to this section: ${heading.textContent?.trim() ?? ''}`);
+			heading.append(link);
+		}
+
+		for (const block of prose.querySelectorAll<HTMLPreElement>('pre')) {
+			const wrap = document.createElement('div');
+			wrap.className = 'docs-code';
+			block.replaceWith(wrap);
+			wrap.append(block);
+
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'docs-copy';
+			button.textContent = 'Copy';
+			button.addEventListener('click', async () => {
+				const text = (block.querySelector('code') ?? block).textContent ?? '';
+				try {
+					await navigator.clipboard.writeText(text.replace(/\n+$/, ''));
+					button.textContent = 'Copied';
+				} catch {
+					// No clipboard (plain http, an old browser): select the block
+					// instead, so the copy is one keystroke away.
+					const range = document.createRange();
+					range.selectNodeContents(block);
+					const selection = window.getSelection();
+					selection?.removeAllRanges();
+					selection?.addRange(range);
+					button.textContent = 'Selected';
+				}
+				window.setTimeout(() => (button.textContent = 'Copy'), 2000);
+			});
+			wrap.append(button);
+		}
+	}
+</script>

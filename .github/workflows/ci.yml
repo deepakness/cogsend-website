@@ -1,0 +1,53 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  # The docs are read from the app repo at build time, so a change there — a
+  # renamed heading an extras block is anchored to, a link to a page that no
+  # longer exists — breaks this build without a commit here. A daily run
+  # surfaces that within a day instead of at the next unrelated push.
+  schedule:
+    - cron: '17 6 * * *'
+
+# Pull requests from forks run this too once the repository is public. Nothing
+# here needs to write, and no secret is used, so the token stays read-only.
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12'
+          cache: npm
+
+      - run: npm ci
+
+      # Types and template errors, before anything is built.
+      - run: npm run check
+
+      - run: npm run build
+
+      # playwright-core ships the installer, so the a11y check does not need the
+      # full `playwright` package or a matching version pin.
+      - run: npx playwright-core install --with-deps chromium
+
+      - name: Serve the build
+        run: |
+          npx astro preview --port 4321 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:4321/ > /dev/null && exit 0
+            sleep 1
+          done
+          echo "preview server never came up" >&2
+          exit 1
+
+      # Contrast, headings and labelling on every page the build emits.
+      - run: npm run check:a11y

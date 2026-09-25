@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { LINKS } from '../config';
+---
+
+<Layout title="Page not found — CogSend" noindex>
+	<Header />
+	<main
+		id="main"
+		class="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-6 py-24 text-center sm:py-32"
+	>
+		<p class="text-[14px] font-bold tracking-widest text-stone-500 uppercase">404</p>
+		<h1 class="mt-4 text-[2.5rem] leading-tight font-extrabold tracking-tight text-stone-900 sm:text-[3rem]">
+			Page not found
+		</h1>
+		<p class="mt-4 text-[16px] leading-relaxed font-medium text-stone-500">
+			We couldn't find the page you were looking for. It may have moved, or the link that brought
+			you here may be out of date.
+		</p>
+		<div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+			<a
+				href="/"
+				class="rounded-full bg-stone-900 px-6 py-3 text-[13px] font-bold text-white shadow-ink transition-all hover:-translate-y-0.5 hover:bg-stone-800"
+			>
+				Go back home
+			</a>
+			<a
+				href={LINKS.docs}
+				class="rounded-full border border-stone-200 bg-white px-6 py-3 text-[13px] font-bold text-stone-700 shadow-pill transition-all hover:-translate-y-0.5 hover:border-stone-300 hover:text-stone-900"
+			>
+				Browse the docs
+			</a>
+		</div>
+	</main>
+	<Footer />
+</Layout>

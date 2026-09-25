@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Features from '../components/Features.astro';
+import Install from '../components/Install.astro';
+import Faq from '../components/Faq.astro';
+import Cta from '../components/Cta.astro';
+import Footer from '../components/Footer.astro';
+import { LINKS, SITE } from '../config';
+
+/**
+ * Built the same way `Layout.astro` builds the `<link rel="canonical">`, so the
+ * structured data and the canonical can never disagree about the home URL.
+ */
+const homeUrl = new URL('/', SITE.url).href;
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	// Two nodes: the product, and the site itself. `WebSite` is what feeds
+	// Google's site-name feature — it is the only thing that still needs a
+	// `WebSite` node now the sitelinks search box has been retired.
+	'@graph': [
+		{
+			'@type': 'SoftwareApplication',
+			name: SITE.name,
+			applicationCategory: 'BusinessApplication',
+			description: SITE.description,
+			url: homeUrl,
+			// Structured data wants an absolute URL, and the deploy guide is a page
+			// on this site now.
+			installUrl: new URL(LINKS.deploy, SITE.url).href,
+			sameAs: [LINKS.repo],
+			license: 'https://opensource.org/licenses/MIT',
+			isAccessibleForFree: true,
+			offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+			author: { '@type': 'Person', name: 'DeepakNess', url: LINKS.author },
+			featureList: [
+				'Thread editor with per-platform overrides',
+				'Long drafts split into threads per platform limit',
+				'Publish now or schedule, per destination',
+				'Automatic retries with backoff',
+				'Media with per-image alt text',
+				'Self-hosted on your own Cloudflare account'
+			]
+		},
+		{
+			'@type': 'WebSite',
+			name: SITE.name,
+			url: homeUrl
+		}
+	]
+};
+---
+
+<Layout>
+	<script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+	<Header />
+	<main id="main">
+		<Hero />
+		<div class="h-px w-full bg-stone-200/50 max-w-5xl mx-auto"></div>
+		<Features />
+		<div class="h-px w-full bg-stone-200/50 max-w-5xl mx-auto"></div>
+		<Install />
+		<div class="h-px w-full bg-stone-200/50 max-w-5xl mx-auto"></div>
+		<Faq />
+		<Cta />
+	</main>
+	<Footer />
+</Layout>

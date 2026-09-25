@@ -1,0 +1,193 @@
+---
+import MockEditor from './MockEditor.astro';
+import CopyCommand from './CopyCommand.astro';
+import { DEMO_VIDEO, INSTALL_COMMAND, LINKS } from '../config';
+import { LoaderCircle, Play, Star, X } from '@lucide/astro';
+---
+
+<section class="relative overflow-hidden pt-24 pb-16 sm:pt-28 sm:pb-24">
+	<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px]" aria-hidden="true">
+		<div class="absolute top-[-160px] left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-stone-200/50 blur-3xl"></div>
+		<div class="absolute top-[120px] left-[10%] h-[260px] w-[320px] rounded-full bg-stone-200/40 blur-3xl"></div>
+	</div>
+
+	<div class="mx-auto max-w-[1180px] px-6 text-center">
+		<p class="mx-auto inline-flex items-center rounded-full border border-stone-200/50 bg-white/60 px-3.5 py-1.5 text-[11px] font-bold tracking-widest text-stone-600 uppercase shadow-sm backdrop-blur-md">
+			Open source &middot; MIT licensed
+		</p>
+		<!-- Both lines are measured to fit `max-w-5xl` at 3.75rem, so the second
+		     one never orphans a word. `text-balance` is the safety net if a
+		     platform's system font renders wider. -->
+		<h1
+			class="mx-auto mt-8 max-w-5xl text-balance text-[2.25rem] leading-[1.08] font-extrabold tracking-tight text-stone-900 sm:text-[3.75rem]"
+		>
+			Your self-hosted social scheduler,<br />
+			<span class="text-stone-500">on your own Cloudflare account.</span>
+		</h1>
+		<p
+			class="mx-auto mt-6 max-w-xl text-balance text-[16px] leading-relaxed font-medium text-stone-500 sm:text-[18px]"
+		>
+			Mastodon, Bluesky, LinkedIn, Threads and X. Write a draft, customize it per platform,
+			then publish it now or schedule it. No subscription — it runs on Cloudflare's free plan.
+		</p>
+
+		<!-- Wide enough for the full install command to wrap onto two clean
+		     lines instead of three ragged ones. -->
+		<div class="mx-auto mt-10 flex max-w-2xl flex-col items-center gap-6">
+			<CopyCommand
+				command={INSTALL_COMMAND}
+				tone="dark"
+				note="Node 22.12+, a Cloudflare account, and five minutes."
+			/>
+
+			<!-- The demo is a button, not a link: it opens a dialog, so the second
+			     CTA can carry the GitHub mark without implying the video leaves
+			     the page. Both mirror the closing section's button pair. -->
+			<div class="flex flex-wrap items-center justify-center gap-3">
+				<button
+					type="button"
+					data-demo-open
+					class="flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-[13px] font-bold text-white shadow-ink transition-all hover:-translate-y-0.5 hover:bg-stone-800"
+				>
+					<Play class="h-4 w-4 fill-current" />
+					Watch demo
+				</button>
+				<a
+					href={LINKS.repo}
+					class="flex items-center gap-2 rounded-full border border-stone-200 bg-white px-6 py-3 text-[13px] font-bold text-stone-700 shadow-pill transition-all hover:-translate-y-0.5 hover:border-stone-300 hover:text-stone-900"
+				>
+					<Star class="h-4 w-4" />
+					Star on GitHub
+				</a>
+			</div>
+		</div>
+
+		<!-- Interactive App Mock -->
+		<div class="mt-16 sm:mt-24" data-reveal>
+			<MockEditor />
+		</div>
+	</div>
+
+	<!--
+		The demo player. The <video> ships with no `src`, so a page load makes no
+		request for the 67 MB file at all: the script below fills it in when
+		somebody opens the dialog and takes it away again when they close it. The
+		box is reserved from the config's dimensions, so the dialog does not jump
+		when the metadata arrives.
+	-->
+	<dialog
+		data-demo-dialog
+		aria-label="CogSend demo"
+		class="m-auto w-[min(1120px,94vw)] max-w-none overflow-hidden rounded-2xl border-0 bg-stone-900 p-0 shadow-card-lift"
+	>
+		<div class="relative">
+			<!-- `autofocus` lands the dialog's focus on the way out rather than on
+			     the player, whose controls a screen reader would otherwise start
+			     reading before the user has heard what opened. -->
+			<button
+				type="button"
+				data-demo-close
+				autofocus
+				aria-label="Close video"
+				class="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-stone-900/70 text-white transition-colors hover:bg-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+			>
+				<X class="h-4 w-4" />
+			</button>
+			<!-- Shown from the click until the first frame can play: without it the
+			     dialog opens on a black box while a large file starts. -->
+			<div
+				data-demo-loading
+				role="status"
+				class="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 text-[13px] font-bold text-stone-300"
+			>
+				<LoaderCircle class="h-4 w-4 animate-spin" aria-hidden="true" />
+				Loading the demo…
+			</div>
+			<video
+				data-demo-video
+				data-src={DEMO_VIDEO.url}
+				controls
+				playsinline
+				preload="none"
+				style={`aspect-ratio: ${DEMO_VIDEO.width} / ${DEMO_VIDEO.height}`}
+				class="block h-auto w-full bg-stone-950"
+			>
+				<p class="p-6 text-center text-[13px] font-medium text-stone-400">
+					This browser cannot play the demo.
+					<a href={DEMO_VIDEO.url} class="font-bold text-white underline">Open the file</a>.
+				</p>
+			</video>
+		</div>
+	</dialog>
+</section>
+
+<style>
+	/* The dialog lives in the browser's top layer, so this is the whole of its
+	   chrome. There is deliberately no backdrop blur: it keeps the compositor
+	   busy for as long as the 1080p video plays, and a flat wash reads the same
+	   on a phone. */
+	[data-demo-dialog]::backdrop {
+		background: rgb(12 12 14 / 0.8);
+	}
+	/* Set on the root so the page behind the dialog cannot scroll away. */
+	:global(html.demo-open) {
+		overflow: hidden;
+	}
+</style>
+
+<script>
+	/**
+	 * The demo is 67 MB, so the one rule here is that nothing is fetched until
+	 * it is asked for. The <video> carries no `src` in the markup and opening
+	 * the dialog is what sets one. Closing takes it away again, which aborts a
+	 * download somebody has changed their mind about and releases the decoded
+	 * frames instead of leaving a 1080p stream parked in memory on a phone.
+	 */
+	const dialog = document.querySelector<HTMLDialogElement>('[data-demo-dialog]');
+	const video = dialog?.querySelector<HTMLVideoElement>('[data-demo-video]');
+	const trigger = document.querySelector<HTMLButtonElement>('[data-demo-open]');
+	const source = video?.dataset.src ?? '';
+	const loading = dialog?.querySelector<HTMLElement>('[data-demo-loading]');
+
+	// The status goes as soon as there is a frame to show.
+	video?.addEventListener('canplay', () => {
+		if (loading) loading.hidden = true;
+	});
+
+	const close = () => dialog?.close();
+
+	trigger?.addEventListener('click', () => {
+		if (!dialog || !video) return;
+		dialog.showModal();
+		document.documentElement.classList.add('demo-open');
+
+		// `getAttribute` rather than `video.src`, which resolves to the page URL
+		// once the attribute has been removed.
+		if (!video.getAttribute('src')) {
+			if (loading) loading.hidden = false;
+			video.src = source;
+			video.load();
+		}
+		// Playback starts from a click, so sound is permitted. If a browser
+		// turns out to refuse anyway, the control bar next to it is the way in.
+		void video.play().catch(() => {});
+	});
+
+	// A click on the backdrop is a click on the dialog itself, since the video
+	// fills the card and the close button is the only other target.
+	dialog?.addEventListener('click', (event) => {
+		if (event.target === dialog) close();
+	});
+	dialog?.querySelector('[data-demo-close]')?.addEventListener('click', close);
+
+	// Runs for the close button, the backdrop and Escape alike, which is why the
+	// teardown lives here rather than inside `close()`.
+	dialog?.addEventListener('close', () => {
+		document.documentElement.classList.remove('demo-open');
+		if (!video) return;
+		video.pause();
+		video.removeAttribute('src');
+		video.load();
+		trigger?.focus();
+	});
+</script>

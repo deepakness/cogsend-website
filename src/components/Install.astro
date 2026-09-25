@@ -1,0 +1,84 @@
+---
+import Terminal from './Terminal.astro';
+import { LINKS } from '../config';
+
+/** Every inline link in this section, so the fine print matches the step link. */
+const LINK_CLASS =
+	'font-bold text-stone-700 underline decoration-stone-300 underline-offset-2 transition-colors hover:text-stone-900 hover:decoration-stone-500';
+
+/**
+ * The same three steps as the deploy guide's "One command", "Check it worked"
+ * and "After the first deploy", in the words and commands the app's docs use.
+ * The clone line is the README's, which `INSTALL_COMMAND` in config.ts also
+ * mirrors.
+ */
+const STEPS = [
+	{
+		title: 'Clone and run setup',
+		body: 'It creates the D1 database and the R2 bucket, generates the secrets, creates your account, applies migrations and deploys. Safe to re-run.',
+		lines: [
+			'git clone --depth 1 https://github.com/deepakness/cogsend.git cogsend',
+			'cd cogsend && npm install && npm run setup'
+		],
+		label: 'Install commands'
+	},
+	{
+		title: 'Check it worked',
+		body: 'Read-only. It confirms the database, the bucket, the secret and the deploy. Every failure prints the command that fixes it.',
+		// A `#` line is shown but never copied, so the paste stays runnable.
+		lines: ['npm run doctor', '# add -- --app-url <url> to ask the live app too'],
+		label: 'Doctor command'
+	},
+	{
+		title: 'Sign in and connect',
+		body: 'Open the URL setup printed, sign in, and scan the QR with an authenticator app. Mastodon and Bluesky connect straight away; LinkedIn, Threads and X each need a developer app of your own first.',
+		link: { href: LINKS.oauth, label: 'Set up the OAuth apps' }
+	}
+];
+---
+
+<section class="mx-auto w-full max-w-[1180px] px-6 py-20 sm:py-32" id="install">
+	<div class="mx-auto mb-16 max-w-2xl text-center">
+		<p class="mb-4 text-[11px] font-bold tracking-widest text-stone-500 uppercase">Install</p>
+		<h2 class="mb-6 text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+			Three steps, about five minutes.
+		</h2>
+		<p class="text-[16px] leading-relaxed font-medium text-stone-500">
+			You need Node 22.12+ and a Cloudflare account with Workers, D1 and R2. Setup is the whole
+			install.
+		</p>
+	</div>
+
+	<!-- grid-cols-1 is load-bearing: it makes the single column `minmax(0, 1fr)`,
+	     so the terminal's long clone line can wrap instead of widening the whole
+	     page on a phone. -->
+	<ol class="grid grid-cols-1 gap-6 lg:grid-cols-3" data-reveal>
+		{
+			STEPS.map((step, index) => (
+				<li class="flex min-w-0 flex-col rounded-[2rem] border border-stone-200/80 bg-white p-7 shadow-card transition-shadow hover:shadow-card-lift">
+					<div
+						class="mb-5 flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 text-[13px] font-extrabold text-stone-600"
+						aria-hidden="true"
+					>
+						{index + 1}
+					</div>
+					<h3 class="mb-3 text-[17px] font-extrabold tracking-tight text-stone-900">{step.title}</h3>
+					<p class="mb-6 text-[14px] leading-relaxed font-medium text-stone-500">{step.body}</p>
+					<div class="mt-auto">
+						{step.lines && <Terminal lines={step.lines} label={step.label} />}
+						{step.link && (
+							<a href={step.link.href} class={LINK_CLASS}>
+								{step.link.label} →
+							</a>
+						)}
+					</div>
+				</li>
+			))
+		}
+	</ol>
+
+	<p class="mt-8 text-center text-[14px] font-medium text-stone-500">
+		Every command, flag and failure mode is in the{' '}
+		<a href={LINKS.deploy} class={LINK_CLASS}>install and deploy guide</a>.
+	</p>
+</section>

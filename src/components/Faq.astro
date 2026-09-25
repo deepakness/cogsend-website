@@ -1,0 +1,150 @@
+---
+import { LINKS } from '../config';
+
+/** Every inline link here, matching the step links in Install. */
+const LINK_CLASS =
+	'font-bold text-stone-700 underline decoration-stone-300 underline-offset-2 transition-colors hover:text-stone-900 hover:decoration-stone-500';
+
+const ANSWER_CLASS = 'text-[15px] leading-relaxed font-medium text-stone-600';
+
+/**
+ * The same answers as plain text, for search engines. Kept next to the markup
+ * so a changed answer is changed in both places in one edit.
+ */
+const faqLd = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: [
+		[
+			'What does it cost?',
+			"Nothing, for a personal instance. There is no subscription and no account with us: you deploy it to your own Cloudflare account, on Cloudflare's free plan. Cloudflare asks for a card on file for R2, the bucket that stores your images; Workers and D1 never ask for one, and you are only charged if you go past the free limits."
+		],
+		[
+			'What happens if I hit a Cloudflare limit?',
+			'R2 keeps the first 10 GB free and traffic out is always free. The free plan allows five cron triggers per account, shared with every other Worker; if they are taken, drive the scheduler from your own timer. D1 pauses for the day past 100,000 rows written, resumes at midnight UTC, and nothing is lost.'
+		],
+		[
+			'Do I need a developer app for every platform?',
+			'No. Mastodon and Bluesky connect with what you already have. LinkedIn, Threads and X need an app you register with them first. X also charges for posting: its API is pay-per-use, so fund a small balance before you connect it.'
+		],
+		[
+			'How do I update it later?',
+			'Pull the new code and run npm ci, then npm run deploy:release, which runs the tests, applies database migrations, rebuilds and deploys. Your data lives in your Cloudflare account, never in the repository, so a pull cannot touch it.'
+		],
+		[
+			'Where do my posts and credentials live?',
+			'In your Cloudflare account, in the database and bucket that setup created. Platform tokens are encrypted at rest with AES-256-GCM, and the single admin account signs in with an authenticator app and backup codes.'
+		]
+	].map(([name, text]) => ({
+		'@type': 'Question',
+		name,
+		acceptedAnswer: { '@type': 'Answer', text }
+	}))
+};
+---
+
+<!-- Questions people ask before running this on their own account. The cost
+     answer used to be a card in Install; it belongs here, as an answer to the
+     question a reader is actually asking. -->
+<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+<section class="mx-auto w-full max-w-[1180px] px-6 py-20 sm:py-32" id="faq">
+	<div class="mx-auto mb-14 max-w-2xl text-center">
+		<p class="mb-4 text-[11px] font-bold tracking-widest text-stone-500 uppercase">Questions</p>
+		<h2 class="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+			Before you deploy.
+		</h2>
+	</div>
+
+	<ul class="mx-auto max-w-2xl" data-reveal>
+		<li class="border-t border-stone-200/80 py-7">
+			<h3 class="mb-3 text-[17px] font-extrabold tracking-tight text-stone-900">
+				What does it cost?
+			</h3>
+			<p class={ANSWER_CLASS}>
+				Nothing, for a personal instance. There is no subscription, nothing to cancel, and no account with us — you
+				deploy it to your own Cloudflare account, on Cloudflare's free plan. A personal instance
+				stays well inside it.
+			</p>
+			<p class={`mt-3 ${ANSWER_CLASS}`}>
+				The one thing Cloudflare asks for is a card on file for R2, the bucket that stores your
+				images. Workers and D1 never ask for one, and you are only charged if you go past the free
+				limits.
+			</p>
+		</li>
+
+		<li class="border-t border-stone-200/80 py-7">
+			<h3 class="mb-3 text-[17px] font-extrabold tracking-tight text-stone-900">
+				What happens if I hit a Cloudflare limit?
+			</h3>
+			<ul class="space-y-3 text-[14px] leading-relaxed font-medium text-stone-600">
+				<li>
+					<span class="font-bold text-stone-800">Storage.</span> R2 keeps the first 10 GB free, and
+					traffic out is always free.
+				</li>
+				<li>
+					<span class="font-bold text-stone-800">Cron triggers.</span> Five per account, shared with
+					every other Worker you run. If they are taken, drive the scheduler from your own timer
+					instead.
+				</li>
+				<li>
+					<span class="font-bold text-stone-800">The database.</span> D1 pauses for the day past
+					100,000 rows written. It resumes at midnight UTC, and nothing is lost.
+				</li>
+			</ul>
+			<p class="mt-3 text-[13px] leading-relaxed font-medium text-stone-600">
+				Numbers can change:{' '}
+				<a href={LINKS.cfWorkersLimits} class={LINK_CLASS}>Workers limits</a>,{' '}
+				<a href={LINKS.cfD1Pricing} class={LINK_CLASS}>D1</a>,{' '}
+				<a href={LINKS.cfR2Pricing} class={LINK_CLASS}>R2</a>.
+			</p>
+		</li>
+
+		<li class="border-t border-stone-200/80 py-7">
+			<h3 class="mb-3 text-[17px] font-extrabold tracking-tight text-stone-900">
+				Do I need a developer app for every platform?
+			</h3>
+			<p class={ANSWER_CLASS}>
+				No. Mastodon and Bluesky connect with what you already have. LinkedIn, Threads and X need an
+				app you register with them first, because they issue the client id and secret your Worker
+				uses — pick one and the app shows you exactly what to create.
+			</p>
+			<p class={`mt-3 ${ANSWER_CLASS}`}>
+				X also charges for posting. Its API is pay-per-use, so fund a small balance before you
+				connect it. See{' '}
+				<a href={LINKS.oauth} class={LINK_CLASS}>
+					OAuth app setup
+				</a>
+				.
+			</p>
+		</li>
+
+		<li class="border-t border-stone-200/80 py-7">
+			<h3 class="mb-3 text-[17px] font-extrabold tracking-tight text-stone-900">
+				How do I update it later?
+			</h3>
+			<p class={ANSWER_CLASS}>
+				Pull the new code and run the release script. That runs the tests, applies database
+				migrations, rebuilds and deploys:
+			</p>
+			<pre
+				class="mt-4 overflow-x-auto rounded-2xl border border-stone-200/80 bg-white px-4 py-3 font-mono text-[12.5px] leading-relaxed font-medium text-stone-900 shadow-pill"><code>git pull
+npm ci
+npm run deploy:release</code></pre>
+			<p class={`mt-4 ${ANSWER_CLASS}`}>
+				Settings tells you when a newer release is out. Your data is never in the repository, so a
+				pull cannot touch it — posts, images and secrets live in your Cloudflare account.
+			</p>
+		</li>
+
+		<li class="border-t border-b border-stone-200/80 py-7">
+			<h3 class="mb-3 text-[17px] font-extrabold tracking-tight text-stone-900">
+				Where do my posts and credentials live?
+			</h3>
+			<p class={ANSWER_CLASS}>
+				In your Cloudflare account, in the database and bucket that setup created for you. Platform
+				tokens are encrypted at rest with AES-256-GCM, and the single admin account signs in with an
+				authenticator app and backup codes. Nothing about your instance lives with us.
+			</p>
+		</li>
+	</ul>
+</section>

@@ -1,0 +1,28 @@
+node_modules
+
+# Build output
+/dist
+.astro
+
+# Docs pages, generated from the app repo's docs/ by `npm run docs:sync`
+/src/content/docs
+
+# Local deployment overrides: your own Worker name and routes. Picked up
+# automatically by wrangler when present.
+wrangler.personal.jsonc
+wrangler.personal.json
+
+# Wrangler's local state (dev assets, caches)
+.wrangler
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Agent workspace (todos, local state)
+.pi/
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea

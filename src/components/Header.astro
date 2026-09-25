@@ -1,0 +1,61 @@
+---
+import Logo from './Logo.astro';
+import { Book } from '@lucide/astro';
+import { LINKS } from '../config';
+import { APP_VERSION } from '../docs/meta';
+
+/**
+ * Where the reader is, so the header can say so. Docs is the only section with
+ * pages of its own; the two in-page links go to the home page's sections from
+ * anywhere, which is why they are `/#install` rather than `#install`.
+ */
+const path = Astro.url.pathname;
+const inDocs = path === '/docs' || path.startsWith('/docs/');
+
+const linkClass =
+	'flex items-center gap-1.5 py-1.5 text-[14px] font-bold transition-colors hover:text-stone-900';
+---
+
+<header class="sticky top-0 z-50 border-b border-stone-200/50 bg-[#fafaf9]/85 backdrop-blur-md">
+	<div class="mx-auto flex h-16 max-w-[1180px] items-center justify-between gap-4 px-6">
+		<div class="flex items-center gap-3">
+			<a href="/" class="group flex items-center gap-2 py-1.5" aria-label="CogSend home">
+				<Logo class="h-6 w-6 text-stone-900 transition-transform duration-300 group-hover:-rotate-12" />
+				<span class="text-[17px] font-extrabold tracking-tight text-stone-900">CogSend</span>
+			</a>
+			<!-- The running release, read from the app's package.json when the docs
+			     are synced. A version number says "this is maintained" faster than
+			     any sentence could. -->
+			{
+				APP_VERSION && (
+					<a
+						href={LINKS.releases}
+						class="hidden rounded-full border border-stone-200/80 bg-white px-2 py-0.5 font-mono text-[11px] font-semibold text-stone-600 transition-colors hover:border-stone-300 hover:text-stone-900 sm:inline-block"
+					>
+						v{APP_VERSION}<span class="sr-only"> release notes</span>
+					</a>
+				)
+			}
+		</div>
+		<nav aria-label="Primary" class="flex items-center gap-5 sm:gap-6">
+			<a href="/#install" class:list={[linkClass, 'hidden text-stone-600 md:flex']}>Install</a>
+			<a href="/#faq" class:list={[linkClass, 'hidden text-stone-600 md:flex']}>FAQ</a>
+			<a
+				href={LINKS.docs}
+				aria-current={inDocs ? 'page' : undefined}
+				class:list={[linkClass, inDocs ? 'text-stone-900' : 'text-stone-600']}
+			>
+				<Book class="h-4 w-4" />
+				Docs
+			</a>
+			<a href={LINKS.repo} class:list={[linkClass, 'text-stone-600']}>
+				<svg class="h-4 w-4 fill-current" viewBox="0 0 24 24" aria-hidden="true"
+					><path
+						d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+					></path></svg
+				>
+				GitHub
+			</a>
+		</nav>
+	</div>
+</header>

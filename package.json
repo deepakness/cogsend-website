@@ -1,0 +1,50 @@
+{
+	"name": "cogsend-website",
+	"type": "module",
+	"version": "0.1.0",
+	"private": true,
+	"description": "The cogsend.com marketing site.",
+	"license": "MIT",
+	"author": "DeepakNess <me@deepakness.com> (https://github.com/deepakness)",
+	"homepage": "https://cogsend.com",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/deepakness/cogsend-website.git"
+	},
+	"bugs": {
+		"url": "https://github.com/deepakness/cogsend-website/issues"
+	},
+	"scripts": {
+		"dev": "astro dev",
+		"predev": "node scripts/sync-docs.mjs",
+		"build": "astro build && pagefind --site dist --glob 'docs/**/*.html'",
+		"prebuild": "node scripts/sync-docs.mjs",
+		"preview": "astro preview",
+		"preview:pages": "wrangler pages dev dist",
+		"precheck": "node scripts/sync-docs.mjs",
+		"check": "astro check",
+		"docs:sync": "node scripts/sync-docs.mjs",
+		"docs:check": "node scripts/sync-docs.mjs --check",
+		"deploy": "npm run build && wrangler pages deploy --project-name cogsend-website --branch main --profile work",
+		"check:a11y": "node scripts/check-a11y.mjs",
+		"og": "node scripts/make-og.mjs"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"dependencies": {
+		"@astrojs/sitemap": "^3.7.4",
+		"@lucide/astro": "^1.47.0",
+		"@tailwindcss/vite": "^4.3.3",
+		"astro": "^7.3.3",
+		"tailwindcss": "^4.3.3"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.5",
+		"axe-core": "^4.13.0",
+		"pagefind": "^1.5.2",
+		"playwright-core": "^1.63.0",
+		"typescript": "^5.9.3",
+		"wrangler": "^4.131.2"
+	}
+}

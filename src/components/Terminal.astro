@@ -1,0 +1,49 @@
+---
+import { Check, Copy } from '@lucide/astro';
+
+interface Props {
+	/** Lines to show. A line starting with `#` is shown as-is, without a `$`. */
+	lines: string[];
+	/** Names the copy button. Three of these sit on one page, so the meaning has
+	 *  to differ per instance. */
+	label?: string;
+	class?: string;
+}
+
+const { lines, label = 'Commands', class: className = '' } = Astro.props;
+const payload = lines.filter((line) => !line.startsWith('#')).join('\n');
+
+/**
+ * Display rows, each pre-split into segments that may break *after* a `/`. The
+ * clone URL is wider than this box at every breakpoint, and `<wbr>` makes it
+ * wrap at its path boundaries instead of through the middle of a word. `<wbr>`
+ * adds no characters, so the display matches `payload` exactly.
+ */
+const rows = lines.map((line) => (line.startsWith('#') ? line : `$ ${line}`).split(/(?<=\/)(?!\/)/));
+---
+
+<!-- The copy handler lives in CopyCommand.astro and is delegated from
+     document, so every [data-copy] button on the page shares it. -->
+<div
+	class:list={[
+		'group relative flex items-start gap-3 rounded-2xl bg-stone-900 p-4 pr-3 shadow-ink',
+		className
+	]}
+>
+	<!-- Wraps rather than scrolling sideways: the clone line is wider than this
+	     card at every breakpoint, and a clipped URL is worse than a wrapped one.
+	     It also means no scroll container, so no tabindex and no region role. -->
+	<pre
+		class="min-w-0 flex-1 font-mono text-[12.5px] leading-[1.7] break-words whitespace-pre-wrap text-stone-100">{rows
+			.map((segments, rowIndex) => (<>{segments.map((segment, i) => (<>{segment}{i < segments.length - 1 && <wbr />}</>))}{rowIndex < rows.length - 1 ? '\n' : ''}</>))}</pre
+	>
+	<button
+		type="button"
+		data-copy={payload}
+		class="shrink-0 rounded-xl p-1.5 text-stone-500 transition-colors hover:bg-stone-800 hover:text-white"
+		aria-label={`Copy ${label.toLowerCase()}`}
+	>
+		<Copy class="h-3.5 w-3.5 group-data-[copied]:hidden" />
+		<Check class="hidden h-3.5 w-3.5 text-emerald-400 group-data-[copied]:block" />
+	</button>
+</div>

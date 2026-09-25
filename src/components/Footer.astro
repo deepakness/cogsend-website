@@ -1,0 +1,74 @@
+---
+import Logo from './Logo.astro';
+import { LINKS, SITE } from '../config';
+
+/** Docs pages, in the order a new deployment would read them, named as the
+ *  docs sidebar names them. */
+const DOCS = [
+	{ href: LINKS.deploy, label: 'Install and deploy' },
+	{ href: LINKS.configuration, label: 'Configuration' },
+	{ href: LINKS.composer, label: 'Writing and publishing' },
+	{ href: LINKS.oauth, label: 'OAuth apps' },
+	{ href: LINKS.scheduling, label: 'Scheduling' },
+	{ href: LINKS.api, label: 'API keys' },
+	{ href: LINKS.docs, label: 'All documentation' }
+];
+
+const PROJECT = [
+	{ href: LINKS.repo, label: 'GitHub' },
+	{ href: LINKS.releases, label: 'Releases' },
+	{ href: LINKS.issues, label: 'Issues' },
+	{ href: LINKS.security, label: 'Security' },
+	{ href: LINKS.license, label: 'MIT license' },
+	{ href: LINKS.siteRepo, label: 'Website source' }
+];
+
+// py-1 keeps each link a 28px touch target without changing the visual rhythm
+// (28px rows on a 4px gap read the same as 20px rows on a 10px gap).
+const linkClass = 'py-1 text-[13px] font-medium text-stone-600 transition-colors hover:text-stone-900';
+const headingClass = 'text-[11px] font-bold tracking-widest text-stone-500 uppercase';
+---
+
+<footer class="mt-16 border-t border-stone-200/50 bg-[#fafaf9]">
+	<div class="mx-auto flex w-full max-w-[1180px] flex-col gap-10 px-6 py-12">
+		<div class="flex flex-col gap-10 sm:flex-row sm:justify-between">
+			<div class="max-w-xs">
+				<a href="/" class="group flex items-center gap-2 py-1.5" aria-label="CogSend home">
+					<Logo
+						class="h-5 w-5 text-stone-900 transition-transform duration-300 group-hover:-rotate-12"
+					/>
+					<span class="text-[15px] font-extrabold tracking-tight text-stone-900">CogSend</span>
+				</a>
+				<p class="mt-3 text-[13px] leading-relaxed font-medium text-stone-500">
+					The self-hosted social scheduler for Mastodon, Bluesky, LinkedIn, Threads and X.
+				</p>
+			</div>
+
+			<nav aria-label="Documentation" class="flex flex-col gap-1">
+				<h2 class={headingClass}>Docs</h2>
+				{DOCS.map(({ href, label }) => <a class={linkClass} href={href}>{label}</a>)}
+			</nav>
+
+			<nav aria-label="Project" class="flex flex-col gap-1">
+				<h2 class={headingClass}>Project</h2>
+				{PROJECT.map(({ href, label }) => <a class={linkClass} href={href}>{label}</a>)}
+			</nav>
+		</div>
+
+		<div
+			class="flex flex-col gap-3 border-t border-stone-200/50 pt-6 sm:flex-row sm:items-center sm:justify-between"
+		>
+			<p class="text-[13px] font-medium text-stone-500">
+				MIT licensed · Made by <a
+					href={LINKS.author}
+					class="font-bold text-stone-600 transition-colors hover:text-stone-900">DeepakNess</a
+				>
+			</p>
+			<p class="text-[13px] font-medium text-stone-500">
+				<a href={SITE.url} class="inline-block py-1 transition-colors hover:text-stone-900">
+					{SITE.url.replace('https://', '')}
+				</a>
+			</p>
+		</div>
+	</div>
+</footer>

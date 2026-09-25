@@ -1,0 +1,42 @@
+---
+import { ArrowRight, Star } from '@lucide/astro';
+import CopyCommand from './CopyCommand.astro';
+import { INSTALL_COMMAND, LINKS } from '../config';
+---
+
+<section class="mx-auto w-full max-w-[1180px] px-6 pb-4">
+	<div
+		class="rounded-[2rem] border border-stone-200/80 bg-white px-7 py-12 text-center shadow-card"
+		data-reveal
+	>
+		<h2 class="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+			Yours in about five minutes.
+		</h2>
+		<p class="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed font-medium text-stone-500">
+			One clone, one setup command, and the Cloudflare account you already have. No signup, no
+			trial, no monthly bill, and no one else holding your credentials.
+		</p>
+
+		<!-- Same width as the hero's, so the command wraps the same way in both. -->
+		<div class="mx-auto mt-8 max-w-2xl">
+			<CopyCommand command={INSTALL_COMMAND} tone="dark" />
+		</div>
+
+		<div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+			<a
+				href={LINKS.deploy}
+				class="flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-[13px] font-bold text-white shadow-ink transition-all hover:-translate-y-0.5 hover:bg-stone-800"
+			>
+				Read the install guide
+				<ArrowRight class="h-4 w-4" />
+			</a>
+			<a
+				href={LINKS.repo}
+				class="flex items-center gap-2 rounded-full border border-stone-200 bg-white px-6 py-3 text-[13px] font-bold text-stone-700 shadow-pill transition-all hover:-translate-y-0.5 hover:border-stone-300 hover:text-stone-900"
+			>
+				<Star class="h-4 w-4" />
+				Star on GitHub
+			</a>
+		</div>
+	</div>
+</section>

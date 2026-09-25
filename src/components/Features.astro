@@ -1,0 +1,224 @@
+---
+import {
+	CalendarClock,
+	ChartColumn,
+	RefreshCw,
+	Layers,
+	KeyRound,
+	Link2,
+	Scissors,
+	ImageIcon
+} from '@lucide/astro';
+import SocialIcon from './SocialIcon.astro';
+---
+
+<section class="mx-auto w-full max-w-[1180px] px-6 py-20 sm:py-32" id="features">
+	<div class="text-center max-w-2xl mx-auto mb-16 sm:mb-24">
+		<p class="text-[11px] font-bold tracking-widest text-stone-500 uppercase mb-4">Features</p>
+		<h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 mb-6">A thread editor, a queue and a retry rule.</h2>
+		<p class="text-stone-500 text-[16px] font-medium leading-relaxed">Enough to run a presence on five networks from one place — with the delivery stats that tell you what broke, and none of the vanity charts you would never open.</p>
+	</div>
+
+	<div class="flex flex-col gap-24 sm:gap-32">
+		<!-- Posts Interactive Mock -->
+		<div class="grid items-center gap-12 lg:grid-cols-2" data-reveal>
+			<div class="max-w-lg lg:order-last">
+				<p class="text-[11px] font-bold tracking-widest text-stone-500 uppercase">Posts</p>
+				<h3 class="mt-3 text-2xl font-extrabold tracking-tight text-stone-900 sm:text-[1.75rem]">
+					Everything you scheduled, in one list
+				</h3>
+				<p class="mt-4 text-[15px] leading-relaxed font-medium text-stone-500">
+					Scheduled, published, failed and draft, with the account icons right there. Cancel or reschedule a queued post without opening it.
+				</p>
+				<ul class="mt-6 space-y-3">
+					<li class="flex items-center gap-3 text-[14px] font-medium text-stone-600">
+						<div class="w-1.5 h-1.5 rounded-full bg-stone-300"></div> Per-destination results
+					</li>
+					<li class="flex items-center gap-3 text-[14px] font-medium text-stone-600">
+						<div class="w-1.5 h-1.5 rounded-full bg-stone-300"></div> Cancel and reschedule straight from the list
+					</li>
+				</ul>
+			</div>
+
+			<!-- Mock Posts List. min-h rather than a fixed height: the two cards are
+			     taller than 400px below 414px, and a fixed box was cutting off the
+			     second card's time. -->
+			<div aria-hidden="true" class="rounded-[2rem] border border-stone-200/80 bg-white p-2 shadow-card-lift overflow-hidden min-h-[400px] flex flex-col font-sans">
+				<!-- The five filters the Posts page actually has. Each label stays on
+				     one line; the row wraps when the frame is narrower than all five,
+				     so a phone never slices a word off the edge. -->
+				<div class="flex flex-wrap items-center gap-1 border-b border-stone-100 px-4 pt-3 pb-2">
+					<div class="shrink-0 whitespace-nowrap rounded-full bg-stone-100 px-3 py-1.5 text-[13px] font-bold text-stone-900">All Posts <span class="opacity-50">4</span></div>
+					<div class="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-bold text-stone-500">Scheduled <span class="opacity-50">2</span></div>
+					<div class="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-bold text-stone-500">Published <span class="opacity-50">1</span></div>
+					<div class="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-bold text-stone-500">Failed</div>
+					<div class="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-bold text-stone-500">Drafts <span class="opacity-50">1</span></div>
+				</div>
+				<div class="flex-1 p-4 space-y-4">
+					
+					<div class="group rounded-2xl border border-stone-100 bg-stone-50/50 p-4 hover:border-stone-200 hover:bg-white transition-colors">
+						<div class="flex items-center justify-between mb-3">
+							<div class="flex items-center gap-2">
+								<div class="w-6 h-6 rounded-full bg-black flex items-center justify-center">
+									<SocialIcon platform="x" class="w-3 h-3 text-white" />
+								</div>
+								<div class="text-[12px] font-bold text-stone-700">@x_user</div>
+							</div>
+							<div class="px-2 py-1 rounded bg-sky-50 text-sky-700 text-[10px] font-bold uppercase tracking-wider">Scheduled</div>
+						</div>
+						<p class="text-[14px] text-stone-900 font-medium mb-3">Just pushed a huge update to the open-source scheduler! 🎉 Check out the new interactive composer.</p>
+						<div class="mt-4 flex flex-wrap items-center justify-between gap-y-1">
+							<div class="text-[12px] font-bold text-stone-500">Tomorrow, 9:00 AM</div>
+							<!-- Hover-only, exactly like the app's card actions. tabindex="-1"
+							     because nothing inside this aria-hidden picture should be
+							     reachable by keyboard, and focus-within so a pointer user who
+							     is mid-hover keeps them visible. -->
+							<div class="flex gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+								<button tabindex="-1" class="px-2 text-[11px] font-bold text-stone-500 hover:text-stone-900">Edit Post</button>
+								<button tabindex="-1" class="px-2 text-[11px] font-bold text-stone-500 hover:text-stone-900">Reschedule</button>
+								<button tabindex="-1" class="px-2 text-[11px] font-bold text-red-600 hover:text-red-700">Cancel</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="group rounded-2xl border border-stone-100 bg-stone-50/50 p-4 hover:border-stone-200 hover:bg-white transition-colors">
+						<div class="flex items-center justify-between mb-3">
+							<div class="flex items-center gap-2">
+								<div class="w-6 h-6 rounded-full bg-[#6364ff] flex items-center justify-center">
+									<SocialIcon platform="mastodon" class="w-3 h-3 text-white" />
+								</div>
+								<div class="text-[12px] font-bold text-stone-700">@mastodon_user</div>
+							</div>
+							<div class="px-2 py-1 rounded bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">Published</div>
+						</div>
+						<p class="text-[14px] text-stone-900 font-medium mb-3">Self-hosting your tools feels so good. No monthly subscriptions to track.</p>
+						<div class="mt-4 flex flex-wrap items-center justify-between gap-y-1">
+							<div class="text-[12px] font-bold text-stone-500">Today, 2:30 PM</div>
+							<div class="flex gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+								<button tabindex="-1" class="px-2 text-[11px] font-bold text-stone-500 hover:text-stone-900">Post again</button>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<!-- Insights Interactive Mock -->
+		<div class="grid items-center gap-12 lg:grid-cols-2" data-reveal>
+			<div class="max-w-lg">
+				<p class="text-[11px] font-bold tracking-widest text-stone-500 uppercase">Insights</p>
+				<h3 class="mt-3 text-2xl font-extrabold tracking-tight text-stone-900 sm:text-[1.75rem]">
+					Delivery stats that tell you what broke
+				</h3>
+				<p class="mt-4 text-[15px] leading-relaxed font-medium text-stone-500">
+					Published against failed, bucketed by your local days, with the same period before it
+					alongside. Failures are grouped by reason, so a platform-wide problem looks different
+					from one bad post.
+				</p>
+				<ul class="mt-6 space-y-3">
+					<li class="flex items-center gap-3 text-[14px] font-medium text-stone-600">
+						<div class="w-1.5 h-1.5 rounded-full bg-stone-400"></div> 7, 30 and 90 day ranges, in your own timezone
+					</li>
+					<li class="flex items-center gap-3 text-[14px] font-medium text-stone-600">
+						<div class="w-1.5 h-1.5 rounded-full bg-stone-400"></div> Failure reasons grouped, not a wall of API errors
+					</li>
+					<li class="flex items-center gap-3 text-[14px] font-medium text-stone-600">
+						<div class="w-1.5 h-1.5 rounded-full bg-stone-400"></div> Last post at a glance, so a silent week is obvious
+					</li>
+				</ul>
+			</div>
+
+			<!-- Mock Insights -->
+			<div aria-hidden="true" class="rounded-[2rem] border border-stone-200/80 bg-[#fafaf9] p-6 shadow-card-lift overflow-hidden font-sans flex flex-col gap-6">
+				<!-- The three cards the Insights page really has, in its own order:
+				     Published, Scheduled, Last post. The delta is a signed count
+				     ("+18 vs previous"), never a percentage. -->
+				<!-- Two across with the last one spanning, exactly like the real page
+				     at narrow widths. -->
+				<!-- Same grid the app uses: two across on a phone, all three in one
+				     row from `sm` up. -->
+				<div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+					<div class="rounded-[1.25rem] border border-stone-200/50 bg-white p-3.5 shadow-sm">
+						<div class="text-2xl font-extrabold tracking-tight text-stone-900">142</div>
+						<div class="mt-1 text-[10px] font-bold tracking-widest text-stone-500 uppercase">Published</div>
+						<div class="mt-1 text-[11px] font-bold text-emerald-700">+18 vs previous</div>
+					</div>
+					<div class="rounded-[1.25rem] border border-stone-200/50 bg-white p-3.5 shadow-sm">
+						<div class="text-2xl font-extrabold tracking-tight text-stone-900">6</div>
+						<div class="mt-1 text-[10px] font-bold tracking-widest text-stone-500 uppercase">Scheduled</div>
+						<div class="mt-1 text-[11px] font-bold text-stone-500">next in 4 hours</div>
+					</div>
+					<div class="col-span-2 rounded-[1.25rem] border border-stone-200/50 bg-white p-3.5 shadow-sm sm:col-span-1">
+						<div class="text-lg font-extrabold tracking-tight text-stone-900 sm:text-xl">2 hours ago</div>
+						<div class="mt-1 text-[10px] font-bold tracking-widest text-stone-500 uppercase">Last post</div>
+						<div class="mt-1 truncate text-[11px] font-bold text-stone-500">Mastodon</div>
+					</div>
+				</div>
+
+				<!-- Fake Chart -->
+				<div class="bg-white p-5 rounded-[1.25rem] border border-stone-200/50 shadow-sm flex-1">
+					<div class="flex flex-wrap items-baseline justify-between gap-2 mb-5">
+						<div class="text-[13px] font-extrabold tracking-tight text-stone-900">Posts per day</div>
+						<div class="flex items-center gap-2">
+							<div class="text-[11px] font-semibold text-stone-500">Last 30 days</div>
+							<div class="inline-flex rounded-lg bg-stone-200/50 p-0.5">
+								<div class="rounded-md px-2 py-0.5 text-[10px] font-bold text-stone-600">Cumulative</div>
+								<div class="rounded-md bg-white px-2 py-0.5 text-[10px] font-bold text-stone-900 shadow-sm">Bars</div>
+							</div>
+						</div>
+					</div>
+					<div class="h-32 flex items-end gap-1.5 justify-between px-1">
+						<!-- Bars -->
+						<div class="w-full bg-stone-100 rounded-t-sm h-[30%] hover:bg-stone-200 transition-colors relative group">
+							<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none">4 posts</div>
+						</div>
+						<div class="w-full bg-stone-900 rounded-t-sm h-[70%] hover:bg-stone-700 transition-colors relative group">
+							<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none">12 posts</div>
+						</div>
+						<div class="w-full bg-stone-100 rounded-t-sm h-[40%] hover:bg-stone-200 transition-colors relative group"></div>
+						<div class="w-full bg-stone-100 rounded-t-sm h-[20%] hover:bg-stone-200 transition-colors relative group"></div>
+						<div class="w-full bg-stone-900 rounded-t-sm h-[90%] hover:bg-stone-700 transition-colors relative group">
+							<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none">15 posts</div>
+						</div>
+						<div class="w-full bg-stone-100 rounded-t-sm h-[50%] hover:bg-stone-200 transition-colors relative group"></div>
+						<div class="w-full bg-stone-100 rounded-t-sm h-[60%] hover:bg-stone-200 transition-colors relative group"></div>
+					</div>
+					<!-- Real bucket labels are dates, and only some are drawn. -->
+					<div class="mt-2.5 flex justify-between px-1 text-[10px] font-bold tracking-wider text-stone-500">
+						<span>Sep 2</span>
+						<span>Sep 16</span>
+						<span>Sep 30</span>
+					</div>
+				</div>
+
+				<!-- Verbatim shape of the real failure summary under the chart. -->
+				<p class="flex flex-wrap items-baseline gap-x-2 text-[12.5px] font-medium text-stone-600">
+					<strong class="text-[13px] font-extrabold text-stone-900">2 failed</strong>
+					<span class="text-stone-500">— X rate limit ×1, Threads media timeout ×1</span>
+					<span class="text-[12px] font-extrabold text-stone-900 underline-offset-2">Review in Posts →</span>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<!-- Grid Features -->
+	<ul class="mt-24 sm:mt-32 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+		{[
+			{ icon: Layers, title: 'Per-platform overrides', body: 'Rewrite the post for X without touching the LinkedIn version.' },
+			{ icon: Scissors, title: 'Threads that split themselves', body: 'Paste a long draft and it becomes a thread that fits the tightest platform you picked, counted the way each one counts.' },
+			{ icon: CalendarClock, title: 'Publish now or schedule', body: 'Send it immediately or pick a time. Every destination carries its own status.' },
+			{ icon: RefreshCw, title: 'Retries handle themselves', body: 'Retryable failures back off on their own — five attempts, then they park in Failed.' },
+			{ icon: ImageIcon, title: 'Media with alt text', body: 'Up to four images per post, with alt text on each one.' },
+			{ icon: Link2, title: 'Link previews', body: 'See the card a URL will make while you are still writing the post.' },
+			{ icon: KeyRound, title: 'A personal API key', body: 'Drafts, publishing and scheduling from scripts, Shortcuts and cron. It can never connect accounts or mint keys.' },
+			{ icon: ChartColumn, title: 'A scheduler you can see', body: 'Settings shows the running version, whether the tick is arriving, and when a newer release is out.' }
+		].map(({ icon: Icon, title, body }) => (
+			<li class="rounded-[1.75rem] border border-stone-200/60 bg-white p-6 shadow-card transition-all hover:border-stone-300 hover:shadow-card-lift" data-reveal>
+				<Icon class="h-5 w-5 text-stone-500" />
+				<h3 class="mt-4 text-[14px] font-extrabold tracking-tight text-stone-900">{title}</h3>
+				<p class="mt-2 text-[13px] leading-relaxed font-medium text-stone-500">{body}</p>
+			</li>
+		))}
+	</ul>
+</section>

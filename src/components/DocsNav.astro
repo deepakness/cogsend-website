@@ -1,0 +1,47 @@
+---
+import { DOCS_NAV } from '../docs/nav.mjs';
+
+interface Props {
+	/** The slug being read, so the current page can be marked for everyone. */
+	active?: string;
+	class?: string;
+}
+
+const { active, class: className = '' } = Astro.props;
+---
+
+<!-- One nav, two places: the sidebar on a laptop and inside the disclosure on a
+     phone. `aria-current` is what tells a screen reader which page it is on, and
+     the same attribute carries the only visual difference between the items. -->
+<nav aria-label="Documentation" class={className}>
+	{
+		DOCS_NAV.map((group) => (
+			<div class="mb-6 last:mb-0">
+				<p class="mb-2 px-3 text-[11px] font-bold tracking-widest text-stone-500 uppercase">
+					{group.group}
+				</p>
+				<ul class="space-y-0.5">
+					{group.items.map((item) => {
+						const current = item.slug === active;
+						return (
+							<li>
+								<a
+									href={`/docs/${item.slug}/`}
+									aria-current={current ? 'page' : undefined}
+									class:list={[
+										'block rounded-xl px-3 py-2 text-[13.5px] font-bold transition-colors',
+										current
+											? 'border border-stone-200/80 bg-white text-stone-900 shadow-pill'
+											: 'border border-transparent text-stone-600 hover:bg-white/70 hover:text-stone-900'
+									]}
+								>
+									{item.title}
+								</a>
+							</li>
+						);
+					})}
+				</ul>
+			</div>
+		))
+	}
+</nav>

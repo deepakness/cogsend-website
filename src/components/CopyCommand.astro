@@ -1,0 +1,115 @@
+---
+import { Check, Copy } from '@lucide/astro';
+
+interface Props {
+	command: string;
+	/** Optional trailing note, e.g. what the command needs installed. */
+	note?: string;
+	/** `dark` matches the terminal blocks; `light` sits on the page background. */
+	tone?: 'light' | 'dark';
+	class?: string;
+}
+
+const { command, note, tone = 'light', class: className = '' } = Astro.props;
+
+/**
+ * Split the command into segments that may break *after* a `/`, so a long URL
+ * wraps at its path boundaries rather than mid-word. The split deliberately
+ * refuses to break between the two slashes of `https://`. `<wbr>` renders
+ * nothing and contributes nothing to selected text, so what is shown stays
+ * identical to what the button copies.
+ */
+const segments = command.split(/(?<=\/)(?!\/)/);
+
+const TONES = {
+	light: {
+		shell: 'border border-stone-200/80 bg-white shadow-pill',
+		prompt: 'text-stone-400',
+		code: 'text-stone-900',
+		button: 'text-stone-500 hover:bg-stone-100 hover:text-stone-900',
+		check: 'text-emerald-600'
+	},
+	dark: {
+		shell: 'bg-stone-900 shadow-ink',
+		prompt: 'text-stone-500',
+		code: 'text-stone-100',
+		// stone-400, not stone-500: the label is real text and needs 4.5:1 on
+		// stone-900, where stone-500 lands at 3.65:1.
+		button: 'text-stone-400 hover:bg-stone-800 hover:text-white',
+		check: 'text-emerald-400'
+	}
+} as const;
+
+const t = TONES[tone];
+---
+
+<div
+	class:list={[
+		'flex items-start gap-3 rounded-2xl py-2.5 pr-2.5 pl-4',
+		t.shell,
+		className
+	]}
+>
+	<span
+		aria-hidden="true"
+		class:list={[
+			'shrink-0 font-mono text-[11.5px] leading-relaxed font-bold select-none sm:text-[12.5px]',
+			t.prompt
+		]}>$</span
+	>
+	<!-- text-left because the hero centres its children, and a command that
+	     wraps must wrap against its own left edge, not the middle. -->
+	<code
+		class:list={[
+			'min-w-0 flex-1 text-left font-mono text-[11.5px] leading-relaxed font-medium break-words sm:text-[12.5px]',
+			t.code
+		]}>{segments.map((segment, i) => (<>{segment}{i < segments.length - 1 && <wbr />}</>))}</code
+	>
+	<button
+		type="button"
+		data-copy={command}
+		class:list={[
+			'group flex shrink-0 items-center gap-1.5 self-center rounded-xl px-2.5 py-1.5 text-[11px] font-bold tracking-wider uppercase transition-colors',
+			t.button
+		]}
+		aria-label="Copy command"
+	>
+		<Copy class="h-3.5 w-3.5 group-data-[copied]:hidden" />
+		<Check class:list={['hidden h-3.5 w-3.5 group-data-[copied]:block', t.check]} />
+		<!-- The label is dropped on a phone so the command keeps the width. The
+		     button still carries its accessible name. -->
+		<span class="hidden group-data-[copied]:hidden sm:inline">Copy</span>
+		<span class:list={['hidden group-data-[copied]:sm:inline', t.check]}>Copied</span>
+	</button>
+</div>
+{
+	note && <p class="mt-2.5 pl-1 text-[13px] font-medium text-stone-500">{note}</p>
+}
+
+<script>
+	// Delegated so every CopyCommand on the page shares one listener, and so a
+	// button added later by another component keeps working.
+	document.addEventListener('click', async (event) => {
+		const button = (event.target as HTMLElement | null)?.closest<HTMLButtonElement>('[data-copy]');
+		if (!button) return;
+		const value = button.dataset.copy ?? '';
+		try {
+			await navigator.clipboard.writeText(value);
+		} catch {
+			// Clipboard access needs a secure context and a user gesture, which a
+			// plain-http localhost run in an odd browser can still refuse. Select
+			// the text instead, so the copy is one keystroke away.
+			const code = button.parentElement?.querySelector('code');
+			if (code) {
+				const range = document.createRange();
+				range.selectNodeContents(code);
+				const selection = window.getSelection();
+				selection?.removeAllRanges();
+				selection?.addRange(range);
+			}
+			return;
+		}
+		button.dataset.copied = '';
+		window.setTimeout(() => delete button.dataset.copied, 2000);
+	});
+</script>

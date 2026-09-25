@@ -1,0 +1,285 @@
+/*
+ * The documentation prose.
+ *
+ * Tailwind has no typography plugin here on purpose: the docs use headings,
+ * paragraphs, lists, tables, quotes, code and media, which is a short enough
+ * list to style by hand once. Everything is scoped to `.docs-prose`, so nothing
+ * here can leak into the marketing page, and the colours are the site's own
+ * stone scale rather than a second palette.
+ *
+ * Content is not written with utility classes: the markdown in
+ * `src/content/docs/` is gitignored, so Tailwind's source scanner never sees it.
+ * A class written in a doc would silently do nothing.
+ */
+
+.docs-prose {
+	font-size: 15.5px;
+	line-height: 1.75;
+	color: #57534e;
+}
+
+/* Heading anchors are linked to from the app's own code (`docs/deploy.md#
+ * updating-and-rolling-back`), so ids matter; the scroll margin keeps the
+ * sticky header from parking on top of the heading you just jumped to. */
+.docs-prose h2,
+.docs-prose h3,
+.docs-prose h4 {
+	color: #0c0c0e;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	scroll-margin-top: 5.5rem;
+}
+.docs-prose h2 {
+	margin: 3rem 0 1rem;
+	font-size: 1.375rem;
+	line-height: 1.3;
+}
+.docs-prose h3 {
+	margin: 2.25rem 0 0.75rem;
+	font-size: 1.0625rem;
+}
+.docs-prose h4 {
+	margin: 1.75rem 0 0.5rem;
+	font-size: 0.9375rem;
+}
+.docs-prose > :first-child {
+	margin-top: 0;
+}
+
+.docs-prose p {
+	margin: 1rem 0;
+}
+.docs-prose strong {
+	color: #1c1917;
+	font-weight: 800;
+}
+
+.docs-prose a {
+	color: #44403c;
+	font-weight: 700;
+	text-decoration: underline;
+	text-decoration-color: #d6d3d1;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 2px;
+	transition:
+		color 0.15s ease,
+		text-decoration-color 0.15s ease;
+}
+.docs-prose a:hover {
+	color: #0c0c0e;
+	text-decoration-color: #a8a29e;
+}
+
+.docs-prose ul,
+.docs-prose ol {
+	margin: 1rem 0;
+	padding-left: 1.375rem;
+}
+/* Tailwind's preflight strips list markers, which is right for the marketing
+   page and wrong for a list of steps. */
+.docs-prose ul {
+	list-style: disc;
+}
+.docs-prose ol {
+	list-style: decimal;
+}
+.docs-prose li {
+	margin: 0.375rem 0;
+}
+.docs-prose li::marker {
+	color: #a8a29e;
+}
+.docs-prose li > ul,
+.docs-prose li > ol {
+	margin: 0.375rem 0;
+}
+
+.docs-prose :not(pre) > code {
+	padding: 0.1rem 0.35rem;
+	border: 1px solid #e7e5e4;
+	border-radius: 0.5rem;
+	background: #f5f5f4;
+	color: #0c0c0e;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.8125em;
+	font-weight: 600;
+	overflow-wrap: break-word;
+}
+
+/* Shiki sets its own colours inline. The docs blocks are meant to read as the
+   same surface as the site's terminal blocks, so they get stone-900 and the
+   theme's token colours are left alone. */
+.docs-prose pre,
+.docs-prose .astro-code {
+	margin: 1.5rem 0;
+	padding: 1rem 1.25rem;
+	border: 1px solid #292524;
+	border-radius: 1.25rem;
+	background: #1c1917 !important;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12.5px;
+	line-height: 1.7;
+}
+/* Shiki's comment colour in `github-dark` is #6A737D, which lands at 3.6:1 on
+   the stone-900 block above and fails AA — the same trap the copy button's dark
+   tone documents. Shiki writes the value inline, so this is one of the few
+   `!important`s on the site; stone-400 is the nearest step that clears 4.5:1,
+   and `npm run check:a11y` measures it. */
+.docs-prose .astro-code span[style*="#6A737D"],
+.docs-prose .astro-code span[style*="#6a737d"] {
+	color: #a8a29e !important;
+}
+
+/* The copy button DocsLayout adds to each block. The wrapper carries the
+   position so the button stays put while a long block wraps; the block keeps
+   room on the right so the first line never runs under it. */
+.docs-prose .docs-code {
+	position: relative;
+}
+.docs-prose .docs-code > pre {
+	padding-right: 4.75rem;
+}
+.docs-prose .docs-copy {
+	position: absolute;
+	top: 0.625rem;
+	right: 0.625rem;
+	padding: 0.25rem 0.625rem;
+	border-radius: 0.625rem;
+	/* stone-400 on stone-900: 4.5:1 and up, like the site's other dark copy
+	   buttons. */
+	color: #a8a29e;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	transition:
+		background-color 0.15s ease,
+		color 0.15s ease;
+}
+.docs-prose .docs-copy:hover {
+	background: #292524;
+	color: #fff;
+}
+.docs-prose .docs-copy:focus-visible {
+	outline-color: #fff;
+}
+
+/* The `#` DocsLayout appends to h2/h3. Quiet until the heading is pointed at
+   or the link itself has focus, so it never competes with the heading. */
+.docs-prose .docs-anchor {
+	margin-left: 0.5rem;
+	/* stone-500: the `#` is real text once it shows, so it needs 4.5:1. */
+	color: #78716c;
+	font-weight: 600;
+	text-decoration: none;
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+.docs-prose h2:hover .docs-anchor,
+.docs-prose h3:hover .docs-anchor,
+.docs-prose .docs-anchor:focus-visible {
+	opacity: 1;
+}
+.docs-prose .docs-anchor:hover {
+	color: #0c0c0e;
+}
+@media (hover: none) {
+	.docs-prose .docs-anchor {
+		opacity: 1;
+	}
+}
+
+.docs-prose table {
+	width: 100%;
+	margin: 1.5rem 0;
+	border-collapse: collapse;
+	font-size: 14px;
+	table-layout: auto;
+}
+.docs-prose th {
+	padding: 0 0.5rem 0.5rem 0;
+	border-bottom: 1px solid #e7e5e4;
+	color: #78716c;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-align: left;
+	text-transform: uppercase;
+}
+.docs-prose td {
+	padding: 0.625rem 0.5rem 0.625rem 0;
+	border-bottom: 1px solid #f5f5f4;
+	vertical-align: top;
+	overflow-wrap: anywhere;
+}
+
+.docs-prose blockquote {
+	margin: 1.5rem 0;
+	padding: 0.25rem 0 0.25rem 1.125rem;
+	border-left: 2px solid #a8a29e;
+	color: #57534e;
+}
+.docs-prose blockquote p {
+	margin: 0.5rem 0;
+}
+
+.docs-prose hr {
+	margin: 2.5rem 0;
+	border: 0;
+	border-top: 1px solid #e7e5e4;
+}
+
+/* Room for what comes later: a screenshot of your own instance, a clip, or a
+   YouTube embed. The aspect ratio is fixed so nothing jumps when it loads. */
+.docs-prose figure {
+	margin: 2rem 0;
+}
+.docs-prose img {
+	width: 100%;
+	height: auto;
+	border: 1px solid #e7e5e4;
+	border-radius: 1.25rem;
+	box-shadow: var(--shadow-card);
+}
+.docs-prose figcaption {
+	margin-top: 0.75rem;
+	color: #78716c;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.6;
+}
+.docs-prose video,
+.docs-prose iframe {
+	display: block;
+	width: 100%;
+	margin: 1.75rem 0;
+	border: 1px solid #e7e5e4;
+	border-radius: 1.25rem;
+	background: #1c1917;
+	aspect-ratio: 16 / 9;
+	box-shadow: var(--shadow-card);
+}
+
+.docs-prose mark {
+	padding: 0 0.15rem;
+	border-radius: 0.25rem;
+	background: var(--color-sel);
+	color: #0c0c0e;
+}
+
+/* A dark block on a printed page is a block of toner. */
+@media print {
+	.docs-prose pre,
+	.docs-prose .astro-code {
+		border-color: #e7e5e4;
+		background: #fff !important;
+	}
+	.docs-prose pre *,
+	.docs-prose .astro-code * {
+		color: #1c1917 !important;
+	}
+	.docs-prose .docs-copy,
+	.docs-prose .docs-anchor {
+		display: none;
+	}
+}
