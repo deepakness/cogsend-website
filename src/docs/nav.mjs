@@ -66,6 +66,12 @@ export const DOCS_NAV = [
 					'Register the developer apps LinkedIn, Threads and X require, then check each platform’s limits on text, images and threads.'
 			},
 			{
+				slug: 'zernio',
+				title: 'Connect through Zernio',
+				description:
+					'Connect X, Threads, LinkedIn and Bluesky through Zernio’s approved apps instead of registering your own, and what differs.'
+			},
+			{
 				slug: 'access',
 				title: 'Cloudflare Access',
 				description:
