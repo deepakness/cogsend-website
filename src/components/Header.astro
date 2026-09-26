@@ -1,16 +1,14 @@
 ---
 import Logo from './Logo.astro';
-import { Book } from '@lucide/astro';
+import { Book, Star } from '@lucide/astro';
 import { LINKS } from '../config';
 import { APP_VERSION } from '../docs/meta';
+import { formatStars, githubStars } from '../github-stars';
 
-/**
- * Where the reader is, so the header can say so. Docs is the only section with
- * pages of its own; the two in-page links go to the home page's sections from
- * anywhere, which is why they are `/#install` rather than `#install`.
- */
+/** Where the reader is, so the header can say so. Docs is the only section with pages of its own. */
 const path = Astro.url.pathname;
 const inDocs = path === '/docs' || path.startsWith('/docs/');
+const stars = await githubStars();
 
 const linkClass =
 	'flex items-center gap-1.5 py-1.5 text-[14px] font-bold transition-colors hover:text-stone-900';
@@ -38,8 +36,6 @@ const linkClass =
 			}
 		</div>
 		<nav aria-label="Primary" class="flex items-center gap-5 sm:gap-6">
-			<a href="/#install" class:list={[linkClass, 'hidden text-stone-600 md:flex']}>Install</a>
-			<a href="/#faq" class:list={[linkClass, 'hidden text-stone-600 md:flex']}>FAQ</a>
 			<a
 				href={LINKS.docs}
 				aria-current={inDocs ? 'page' : undefined}
@@ -55,6 +51,15 @@ const linkClass =
 					></path></svg
 				>
 				GitHub
+				{
+					stars !== null && (
+						<span class="ml-0.5 inline-flex items-center gap-1 rounded-full border border-stone-200/80 bg-white px-2 py-0.5 text-[12px] font-semibold text-stone-600 tabular-nums">
+							<Star class="h-3 w-3" aria-hidden="true" />
+							{formatStars(stars)}
+							<span class="sr-only"> stars</span>
+						</span>
+					)
+				}
 			</a>
 		</nav>
 	</div>
