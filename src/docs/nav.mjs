@@ -98,7 +98,7 @@ export const DOCS_NAV = [
 				slug: 'api',
 				title: 'API keys',
 				description:
-					'Use a personal key from scripts, Shortcuts and cron jobs. The full endpoint reference lives in your own instance, at /api.'
+					'Use a personal key from scripts, Shortcuts, cron jobs and AI agents over MCP. The full endpoint reference lives in your own instance, at /api.'
 			}
 		]
 	},
