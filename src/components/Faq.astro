@@ -28,6 +28,10 @@ const faqLd = {
 			'No. Mastodon and Bluesky connect with what you already have. LinkedIn, Threads and X need an app you register with them first. X also charges for posting: its API is pay-per-use, so fund a small balance before you connect it. If you would rather not register apps, you can connect them through Zernio instead. It has a free plan, though X needs a card there.'
 		],
 		[
+			'Can AI agents like Claude Code use CogSend?',
+			'Yes. Your instance includes an MCP server, so Claude Code, Codex or any MCP client can draft, schedule and publish with your personal API key. A read-only key lets an agent look without posting.'
+		],
+		[
 			'How do I update it later?',
 			'Pull the new code and run npm ci, then npm run deploy:release, which runs the tests, applies database migrations, rebuilds and deploys. Your data lives in your Cloudflare account, never in the repository, so a pull cannot touch it.'
 		],
@@ -120,6 +124,18 @@ const faqLd = {
 				If you would rather not register apps, you can connect them{' '}
 				<a href={LINKS.zernioDocs} class={LINK_CLASS}>through Zernio</a> instead. It has a free
 				plan, though X needs a card there.
+			</p>
+		</li>
+
+		<li class="border-t border-stone-200/80 py-7">
+			<h3 class="mb-3 text-[17px] font-extrabold tracking-tight text-stone-900">
+				Can AI agents like Claude Code use CogSend?
+			</h3>
+			<p class={ANSWER_CLASS}>
+				Yes. Your instance includes an MCP server, so Claude Code, Codex or any MCP client can draft,
+				schedule and publish with your personal API key. A read-only key lets an agent look without
+				posting. See{' '}
+				<a href={`${LINKS.api}#mcp-server`} class={LINK_CLASS}>MCP server</a>.
 			</p>
 		</li>
 
