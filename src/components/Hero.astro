@@ -12,8 +12,17 @@ import { LoaderCircle, Play, Star, X } from '@lucide/astro';
 	</div>
 
 	<div class="mx-auto max-w-[1180px] px-6 text-center">
-		<p class="mx-auto inline-flex items-center rounded-full border border-stone-200/50 bg-white/60 px-3.5 py-1.5 text-[11px] font-bold tracking-widest text-stone-600 uppercase shadow-sm backdrop-blur-md">
-			Open source &middot; MIT licensed
+		<p class="flex flex-wrap items-center justify-center gap-1.5 text-[11px] font-semibold">
+			<span class="inline-flex overflow-hidden rounded-md ring-1 ring-stone-900/10"
+				><span class="bg-stone-800 px-2 py-0.5 text-stone-100">license</span><span
+					class="bg-white px-2 py-0.5 text-stone-800">MIT</span
+				></span
+			>
+			<span class="inline-flex overflow-hidden rounded-md ring-1 ring-stone-900/10"
+				><span class="bg-stone-800 px-2 py-0.5 text-stone-100">source</span><span
+					class="bg-white px-2 py-0.5 text-stone-800">open</span
+				></span
+			>
 		</p>
 		<!-- Both lines are measured to fit `max-w-5xl` at 3.75rem, so the second
 		     one never orphans a word. `text-balance` is the safety net if a
